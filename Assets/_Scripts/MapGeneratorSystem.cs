@@ -1,5 +1,6 @@
 ﻿using Unity.Collections;
 using Unity.Entities;
+using Unity.Transforms;
 using UnityEngine;
 using System;
 
@@ -22,39 +23,53 @@ public class MapGeneratorSystem : ComponentSystem
             {
                 var map = EntityManager.GetSharedComponentData<Map>(generator);
                 map = RndInitMap(map);
-                LogMap(map);
+                //LogMap(map);
                 EntityManager.SetSharedComponentData<Map>(generator, map);
                 EntityManager.RemoveComponent<Initializer>(generator);
+                SpawnMap(map);
             }
         }
     }
 
     private Map RndInitMap(Map map)
     {
-        int rows = map.rows;
-        int cols = map.cols;
-
-        if (rows <= 0 || cols <= 0)
+        if (map.rows <= 0 || map.cols <= 0)
         {
             throw new Exception("Map size < 0");
         }
+        // rows and cols should be odd numbers
+        map.rows = (map.rows % 2) == 0 ? map.rows + 1 : map.rows;
+        map.cols = (map.cols % 2) == 0 ? map.cols + 1 : map.cols;
 
-        // They say NativeArray will be faster in builds though slow in editor than array, so I'll just keep it.
-        // https://forum.unity.com/threads/native-arrays-approximately-an-order-of-magnitude-slower-than-arrays.535019/#post-3526924
-        var mapArray = new NativeArray<int>(rows * cols, Allocator.TempJob);
+        map.mapArray = new int[map.rows * map.cols];
         Unity.Mathematics.Random rnd = new Unity.Mathematics.Random((uint)Guid.NewGuid().GetHashCode());
 
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < map.rows; i++)
+            for (int j = 0; j < map.cols; j++)
+                map.mapArray[i * map.cols + j] = rnd.NextInt(0, 2);
+
+        return map;
+    }
+
+    private void SpawnMap(Map map)
+    {
+        // Create an entity from the prefab set on the spawner component.
+        var prefab = map.wallPrefab;
+        Position position;
+
+        for (int i = 0; i < map.rows; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < map.cols; j++)
             {
-                mapArray[i * cols + j] = rnd.NextInt(0, 2);
+                if (map.mapArray[i * map.cols + j] == 1)
+                {
+                    var entity = EntityManager.Instantiate(prefab);
+                    position.Value = new Unity.Mathematics.float3(i, j, 0f);
+                    EntityManager.SetComponentData(entity, position);
+                }
             }
         }
 
-        map.mapArray = mapArray.ToArray();
-        mapArray.Dispose();
-        return map;
     }
 
     private void LogMap(Map map)
