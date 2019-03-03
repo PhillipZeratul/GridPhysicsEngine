@@ -42,7 +42,7 @@ public class SpawnObjectSystem : ComponentSystem
                     if ((i == map.rows / 2) && (j == map.cols / 2))
                     {
                         var entity = EntityManager.Instantiate(spawner.playerPrefab);
-                        position.Value = new float3(i, j, 0f);
+                        position.Value = new float3(i, j, -1f);
                         EntityManager.SetComponentData(entity, position);
                     }
                     else if (map.mapArray[i * map.cols + j] == 0)
@@ -50,7 +50,7 @@ public class SpawnObjectSystem : ComponentSystem
                         if (rnd.NextFloat(0f, 1f) > 0.3f)
                         {
                             var entity = EntityManager.Instantiate(spawner.obstaclePrefab);
-                            position.Value = new float3(i, j, 0f);
+                            position.Value = new float3(i, j, -1f);
                             EntityManager.SetComponentData(entity, position);
                         }
                     }
