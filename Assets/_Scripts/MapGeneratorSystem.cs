@@ -29,7 +29,6 @@ public class MapGeneratorSystem : ComponentSystem
                 EntityManager.SetSharedComponentData<Map>(generator, map);
                 EntityManager.RemoveComponent<Initializer>(generator);
                 SpawnMap(map);
-
             }
         }
     }
@@ -51,7 +50,7 @@ public class MapGeneratorSystem : ComponentSystem
         for (int i = 0; i < map.rows; i++)
             for (int j = 0; j < map.cols; j++)
                 map.mapArray[i * map.cols + j] = rnd.NextInt(0, 2);
-
+        FillOutsideWall(map.mapArray, map.rows, map.cols);
         return map;
     }
 
@@ -76,12 +75,13 @@ public class MapGeneratorSystem : ComponentSystem
                 float value = noise.cellular(start + new float2(i, j)).y;
                 //Debug.LogFormat("noise[{0}][{1}] = {2}", i, j, value);
                 map.mapArray[i * map.cols + j] = value > 0.77 ? 1 : 0;
-                FillOutblock(map.mapArray, map.rows, map.cols);
             }
+        FillOutsideWall(map.mapArray, map.rows, map.cols);
+        GeneratePlayerSpawnPoint(map.mapArray, map.rows, map.cols);
         return map;
     }
 
-    private void FillOutblock(int[] mapArray, int rows, int cols)
+    private void FillOutsideWall(int[] mapArray, int rows, int cols)
     {
         for (int i = 0; i < rows; i++)
         {
@@ -94,6 +94,22 @@ public class MapGeneratorSystem : ComponentSystem
             mapArray[j] = 1;
             mapArray[rows * (cols - 1) + j] = 1;
         }
+    }
+
+    // Make a 3x3 hole at the middle of the map
+    private void GeneratePlayerSpawnPoint(int[] mapArray, int rows, int cols)
+    {
+        int x = rows / 2 * cols;
+        int y = cols / 2;
+        mapArray[x + y] = 0;
+        mapArray[x + y + 1] = 0;
+        mapArray[x + y - 1] = 0;
+        mapArray[x + cols + y] = 0;
+        mapArray[x + cols + y + 1] = 0;
+        mapArray[x + cols + y - 1] = 0;
+        mapArray[x - cols + y] = 0;
+        mapArray[x - cols + y + 1] = 0;
+        mapArray[x - cols + y - 1] = 0;
     }
 
     private void SpawnMap(Map map)
@@ -109,7 +125,7 @@ public class MapGeneratorSystem : ComponentSystem
                 if (map.mapArray[i * map.cols + j] == 1)
                 {
                     var entity = EntityManager.Instantiate(prefab);
-                    position.Value = new Unity.Mathematics.float3(i, j, 0f);
+                    position.Value = new float3(i, j, 0f);
                     EntityManager.SetComponentData(entity, position);
                 }
             }
