@@ -11,9 +11,9 @@ public struct Map : ISharedComponentData
     // 0 for road
     // 1 for wall
 
-    [Range(5, 31)]
+    [Range(5, 131)]
     public int rows;
-    [Range(5, 31)]
+    [Range(5, 131)]
     public int cols;
 
     public GameObject wallPrefab;

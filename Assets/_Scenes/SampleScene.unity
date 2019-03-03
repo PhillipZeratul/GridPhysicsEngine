@@ -151,7 +151,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 174305620}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.7003713, y: 3.0283613, z: -0.171875}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -170,8 +170,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SerializedData:
-    rows: 11
-    cols: 11
+    rows: 21
+    cols: 21
     wallPrefab: {fileID: 2203122495964048778, guid: 01b5e8983131b4c02a14cadaa3744425,
       type: 3}
     mapArray: 

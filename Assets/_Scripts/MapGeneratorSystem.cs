@@ -1,6 +1,7 @@
 ﻿using Unity.Collections;
 using Unity.Entities;
 using Unity.Transforms;
+using Unity.Mathematics;
 using UnityEngine;
 using System;
 
@@ -22,16 +23,19 @@ public class MapGeneratorSystem : ComponentSystem
             foreach (var generator in mapGeneratorEntities)
             {
                 var map = EntityManager.GetSharedComponentData<Map>(generator);
-                map = RndInitMap(map);
+                //map = WhiteRndInitMap(map);
+                map = WorleyInitMap(map);
                 //LogMap(map);
                 EntityManager.SetSharedComponentData<Map>(generator, map);
                 EntityManager.RemoveComponent<Initializer>(generator);
                 SpawnMap(map);
+
             }
         }
     }
 
-    private Map RndInitMap(Map map)
+    // Map generation with white noise
+    private Map WhiteRndInitMap(Map map)
     {
         if (map.rows <= 0 || map.cols <= 0)
         {
@@ -49,6 +53,47 @@ public class MapGeneratorSystem : ComponentSystem
                 map.mapArray[i * map.cols + j] = rnd.NextInt(0, 2);
 
         return map;
+    }
+
+    // Map generation with Worley noise
+    private Map WorleyInitMap(Map map)
+    {
+        if (map.rows <= 0 || map.cols <= 0)
+        {
+            throw new Exception("Map size < 0");
+        }
+        // rows and cols should be odd numbers
+        map.rows = (map.rows % 2) == 0 ? map.rows + 1 : map.rows;
+        map.cols = (map.cols % 2) == 0 ? map.cols + 1 : map.cols;
+
+        map.mapArray = new int[map.rows * map.cols];
+        var rnd = new Unity.Mathematics.Random((uint)Guid.NewGuid().GetHashCode());
+        float2 start = new float2(rnd.NextFloat2());
+
+        for (int i = 0; i < map.rows; i++)
+            for (int j = 0; j < map.cols; j++)
+            {
+                float value = noise.cellular(start + new float2(i, j)).y;
+                //Debug.LogFormat("noise[{0}][{1}] = {2}", i, j, value);
+                map.mapArray[i * map.cols + j] = value > 0.77 ? 1 : 0;
+                FillOutblock(map.mapArray, map.rows, map.cols);
+            }
+        return map;
+    }
+
+    private void FillOutblock(int[] mapArray, int rows, int cols)
+    {
+        for (int i = 0; i < rows; i++)
+        {
+            mapArray[i * cols] = 1;
+            mapArray[i * cols + cols - 1] = 1;
+        }
+
+        for (int j = 0; j < cols; j++)
+        {
+            mapArray[j] = 1;
+            mapArray[rows * (cols - 1) + j] = 1;
+        }
     }
 
     private void SpawnMap(Map map)
