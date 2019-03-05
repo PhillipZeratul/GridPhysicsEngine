@@ -30,6 +30,7 @@ public class SpawnObjectSystem : ComponentSystem
 
         var rnd = new Unity.Mathematics.Random((uint)Guid.NewGuid().GetHashCode());
         Position position;
+        PhysicsObject physicsObject = new PhysicsObject();
 
         for (int k = 0; k < spawnerEntities.Length; k++)
         {
@@ -42,16 +43,18 @@ public class SpawnObjectSystem : ComponentSystem
                     if ((i == map.rows / 2) && (j == map.cols / 2))
                     {
                         var entity = EntityManager.Instantiate(spawner.playerPrefab);
-                        position.Value = new float3(i, j, -1f);
-                        EntityManager.SetComponentData(entity, position);
+                        physicsObject.cx = i;
+                        physicsObject.cy = j;
+                        EntityManager.SetComponentData(entity, physicsObject);
                     }
                     else if (map.mapArray[i * map.cols + j] == 0)
                     {
                         if (rnd.NextFloat(0f, 1f) > 0.3f)
                         {
                             var entity = EntityManager.Instantiate(spawner.obstaclePrefab);
-                            position.Value = new float3(i, j, -1f);
-                            EntityManager.SetComponentData(entity, position);
+                            physicsObject.cx = i;
+                            physicsObject.cy = j;
+                            EntityManager.SetComponentData(entity, physicsObject);
                         }
                     }
                 }
