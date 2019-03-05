@@ -170,7 +170,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SerializedData:
-    rows: 21
+    rows: 9
     cols: 21
     wallPrefab: {fileID: 2203122495964048778, guid: 01b5e8983131b4c02a14cadaa3744425,
       type: 3}

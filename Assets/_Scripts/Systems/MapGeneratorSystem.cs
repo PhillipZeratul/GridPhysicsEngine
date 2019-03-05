@@ -92,7 +92,7 @@ public class MapGeneratorSystem : ComponentSystem
         for (int j = 0; j < cols; j++)
         {
             mapArray[j] = 1;
-            mapArray[rows * (cols - 1) + j] = 1;
+            mapArray[(rows - 1) * cols + j] = 1;
         }
     }
 
@@ -125,7 +125,7 @@ public class MapGeneratorSystem : ComponentSystem
                 if (map.mapArray[i * map.cols + j] == 1)
                 {
                     var entity = EntityManager.Instantiate(prefab);
-                    position.Value = new float3(i, j, 0f);
+                    position.Value = new float3(j, i, 0f);
                     EntityManager.SetComponentData(entity, position);
                 }
             }

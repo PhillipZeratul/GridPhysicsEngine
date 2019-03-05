@@ -33,7 +33,7 @@ public class CameraMovementSystem : ComponentSystem
         for (int i = 0; i < cameraEntities.Length; i++)
         {
             Map map = EntityManager.GetSharedComponentData<Map>(mapEntities[i]);
-            position.Value = new float3(map.rows / 2, map.cols / 2, -10f);
+            position.Value = new float3(map.cols / 2, map.rows / 2, -10f);
             EntityManager.SetComponentData<Position>(cameraEntities[i], position);
             EntityManager.RemoveComponent<Initializer>(cameraEntities[i]);
         }

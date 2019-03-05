@@ -1,20 +1,20 @@
 ﻿using Unity.Entities;
 using Unity.Collections;
-using Unity.Mathematics;
-using Unity.Transforms;
 using System;
 
 
 public class SpawnObjectSystem : ComponentSystem
 {
-    ComponentGroup spawnerGroup;
-    ComponentGroup mapGroup;
+    private ComponentGroup spawnerGroup;
+    private ComponentGroup mapGroup;
+    private Unity.Mathematics.Random rnd;
 
 
     protected override void OnCreateManager()
     {
         spawnerGroup = GetComponentGroup(typeof(Spawner), typeof(Initializer));
         mapGroup = GetComponentGroup(typeof(Map));
+        rnd = new Unity.Mathematics.Random((uint)Guid.NewGuid().GetHashCode());
     }
 
     protected override void OnUpdate()
@@ -28,8 +28,6 @@ public class SpawnObjectSystem : ComponentSystem
         var spawnerEntities = spawnerGroup.ToEntityArray(Allocator.TempJob);
         var mapEntities = mapGroup.ToEntityArray(Allocator.TempJob);
 
-        var rnd = new Unity.Mathematics.Random((uint)Guid.NewGuid().GetHashCode());
-        Position position;
         PhysicsObject physicsObject = new PhysicsObject();
 
         for (int k = 0; k < spawnerEntities.Length; k++)
@@ -43,8 +41,8 @@ public class SpawnObjectSystem : ComponentSystem
                     if ((i == map.rows / 2) && (j == map.cols / 2))
                     {
                         var entity = EntityManager.Instantiate(spawner.playerPrefab);
-                        physicsObject.cx = i;
-                        physicsObject.cy = j;
+                        physicsObject.cx = j;
+                        physicsObject.cy = i;
                         EntityManager.SetComponentData(entity, physicsObject);
                     }
                     else if (map.mapArray[i * map.cols + j] == 0)
@@ -52,8 +50,8 @@ public class SpawnObjectSystem : ComponentSystem
                         if (rnd.NextFloat(0f, 1f) > 0.3f)
                         {
                             var entity = EntityManager.Instantiate(spawner.obstaclePrefab);
-                            physicsObject.cx = i;
-                            physicsObject.cy = j;
+                            physicsObject.cx = j;
+                            physicsObject.cy = i;
                             EntityManager.SetComponentData(entity, physicsObject);
                         }
                     }
