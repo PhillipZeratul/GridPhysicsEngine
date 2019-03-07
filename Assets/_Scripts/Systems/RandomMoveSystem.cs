@@ -23,8 +23,8 @@ public class RandomMoveSystem : JobComponentSystem
             float moveX = rnd.NextFloat(-obstacle.maxRndMoveSpeed, obstacle.maxRndMoveSpeed) * dT;
             float moveY = rnd.NextFloat(-obstacle.maxRndMoveSpeed, obstacle.maxRndMoveSpeed) * dT;
            
-            physicsObject.dx = moveX;
-            physicsObject.dy = moveY;
+            physicsObject.dx += moveX;
+            physicsObject.dy += moveY;
         }
     }
 

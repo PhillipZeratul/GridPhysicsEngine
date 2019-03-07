@@ -19,6 +19,9 @@ public struct PhysicsObject : IComponentData
     // Movements
     public float dx;
     public float dy;
+
+    // Collision raduis
+    public float radius;
 }
 
 // ComponentDataProxy is for creating a MonoBehaviour representation of this component (for editor support).

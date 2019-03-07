@@ -14,20 +14,37 @@ public class CollisionSystem : JobComponentSystem
         public int rows, cols;
         [DeallocateOnJobCompletion, ReadOnly]
         public NativeArray<int> mapArray;
-        private int dirX, dirY;
+        [DeallocateOnJobCompletion, ReadOnly]
+        public NativeArray<PhysicsObject> objArray;
 
 
         public void Execute(ref Position position, ref PhysicsObject p)
         {
-            dirX = (int)math.sign(p.dx);
-            dirY = (int)math.sign(p.dy);
-
             p.rx += p.dx;
             p.ry += p.dy;
             p.dx *= 0.96f;
             p.dy *= 0.96f;
 
-            // Collision Detection
+            // Repel Collision
+            for (int i = 0; i < objArray.Length; i++)           
+                // If not itself
+                if ((System.Math.Abs(p.xx - objArray[i].xx) > 0.01f) || (System.Math.Abs(p.yy - objArray[i].yy) > 0.01f))                
+                    // Fast distance check
+                    if (math.abs(p.cx - objArray[i].cx) <= 2 && math.abs(p.cy - objArray[i].cy) <= 2)
+                    {
+                        // Real distance check
+                        var dist = math.sqrt((objArray[i].xx - p.xx) * (objArray[i].xx - p.xx) + (objArray[i].yy - p.yy) * (objArray[i].yy - p.yy));
+                        if (dist <= p.radius + objArray[i].radius)
+                        {
+                            float ang = math.atan2(objArray[i].yy - p.yy, objArray[i].xx - p.xx);
+                            float force = 0.02f;
+                            float repelPower = (p.radius + objArray[i].radius - dist) / (p.radius + objArray[i].radius);
+                            p.dx -= math.cos(ang) * repelPower * force;
+                            p.dy -= math.sin(ang) * repelPower * force;
+                        }
+                    }
+
+            // Wall Collision Detection
             if (p.rx >= 0.2f && IsWall(p.cx + 1, p.cy))
             {
                 p.rx = 0.2f;
@@ -60,6 +77,13 @@ public class CollisionSystem : JobComponentSystem
             position.Value = new float3(p.xx, p.yy, -1f);
         }
 
+        private bool IsRepel()
+        {
+
+
+            return true;
+        }
+
         // x: col (left -> right), y: row (down -> up)
         private bool IsWall(int x, int y)
         {
@@ -75,11 +99,13 @@ public class CollisionSystem : JobComponentSystem
     }
 
     private ComponentGroup mapGroup;
+    private ComponentGroup objGroup;
 
 
     protected override void OnCreateManager()
     {
         mapGroup = GetComponentGroup(typeof(Map));
+        objGroup = GetComponentGroup(typeof(PhysicsObject));
     }
 
     protected override JobHandle OnUpdate(JobHandle inputDeps)
@@ -88,11 +114,14 @@ public class CollisionSystem : JobComponentSystem
         Map map = EntityManager.GetSharedComponentData<Map>(mapEntityArray[0]);
         var mapArray = new NativeArray<int>(map.mapArray, Allocator.TempJob);
 
+        var objArray = objGroup.ToComponentDataArray<PhysicsObject>(Allocator.TempJob);
+
         var job = new CollisionJob
         {
             rows = map.rows,
             cols = map.cols,
-            mapArray = mapArray
+            mapArray = mapArray,
+            objArray = objArray
         };
 
         mapEntityArray.Dispose();

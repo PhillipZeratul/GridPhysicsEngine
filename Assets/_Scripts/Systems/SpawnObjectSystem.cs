@@ -43,6 +43,7 @@ public class SpawnObjectSystem : ComponentSystem
                         var entity = EntityManager.Instantiate(spawner.playerPrefab);
                         physicsObject.cx = j;
                         physicsObject.cy = i;
+                        physicsObject.radius = spawner.playerPrefab.GetComponent<PhysicsObjectProxy>().Value.radius;
                         EntityManager.SetComponentData(entity, physicsObject);
                     }
                     else if (map.mapArray[i * map.cols + j] == 0)
@@ -52,6 +53,7 @@ public class SpawnObjectSystem : ComponentSystem
                             var entity = EntityManager.Instantiate(spawner.obstaclePrefab);
                             physicsObject.cx = j;
                             physicsObject.cy = i;
+                            physicsObject.radius = spawner.playerPrefab.GetComponent<PhysicsObjectProxy>().Value.radius;
                             EntityManager.SetComponentData(entity, physicsObject);
                         }
                     }
