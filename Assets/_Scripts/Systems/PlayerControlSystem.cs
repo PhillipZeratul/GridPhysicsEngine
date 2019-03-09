@@ -34,10 +34,10 @@ public class PlayerControlSystem : ComponentSystem
         physicsObject.dx += physicsObject.moveSpeed * dT * control.move.x;
         physicsObject.dy += physicsObject.moveSpeed * dT * control.move.y;
 
-        if (physicsObject.dx > 0.05f) physicsObject.dx = 0.05f;
-        if (physicsObject.dx < -0.05f) physicsObject.dx = -0.05f;
-        if (physicsObject.dy > 0.05f) physicsObject.dy = 0.05f;
-        if (physicsObject.dy < -0.05f) physicsObject.dy = -0.05f;
+        if (physicsObject.dx > physicsObject.maxSpeed) physicsObject.dx = physicsObject.maxSpeed;
+        if (physicsObject.dx < -physicsObject.maxSpeed) physicsObject.dx = -physicsObject.maxSpeed;
+        if (physicsObject.dy > physicsObject.maxSpeed) physicsObject.dy = physicsObject.maxSpeed;
+        if (physicsObject.dy < -physicsObject.maxSpeed) physicsObject.dy = -physicsObject.maxSpeed;
 
         EntityManager.SetComponentData<PhysicsObject>(playerEntities[0], physicsObject);
 

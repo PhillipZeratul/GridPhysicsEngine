@@ -77,13 +77,6 @@ public class CollisionSystem : JobComponentSystem
             position.Value = new float3(p.xx, p.yy, -1f);
         }
 
-        private bool IsRepel()
-        {
-
-
-            return true;
-        }
-
         // x: col (left -> right), y: row (down -> up)
         private bool IsWall(int x, int y)
         {
