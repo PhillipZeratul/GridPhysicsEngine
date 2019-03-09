@@ -28,7 +28,7 @@ public class SpawnObjectSystem : ComponentSystem
         var spawnerEntities = spawnerGroup.ToEntityArray(Allocator.TempJob);
         var mapEntities = mapGroup.ToEntityArray(Allocator.TempJob);
 
-        PhysicsObject physicsObject = new PhysicsObject();
+        PhysicsObject physicsObject;
 
         for (int k = 0; k < spawnerEntities.Length; k++)
         {
@@ -41,9 +41,9 @@ public class SpawnObjectSystem : ComponentSystem
                     if ((i == map.rows / 2) && (j == map.cols / 2))
                     {
                         var entity = EntityManager.Instantiate(spawner.playerPrefab);
+                        physicsObject = spawner.playerPrefab.GetComponent<PhysicsObjectProxy>().Value;
                         physicsObject.cx = j;
                         physicsObject.cy = i;
-                        physicsObject.radius = spawner.playerPrefab.GetComponent<PhysicsObjectProxy>().Value.radius;
                         EntityManager.SetComponentData(entity, physicsObject);
                     }
                     else if (map.mapArray[i * map.cols + j] == 0)
@@ -51,9 +51,9 @@ public class SpawnObjectSystem : ComponentSystem
                         if (rnd.NextFloat(0f, 1f) > 0.3f)
                         {
                             var entity = EntityManager.Instantiate(spawner.obstaclePrefab);
+                            physicsObject = spawner.playerPrefab.GetComponent<PhysicsObjectProxy>().Value;
                             physicsObject.cx = j;
                             physicsObject.cy = i;
-                            physicsObject.radius = spawner.playerPrefab.GetComponent<PhysicsObjectProxy>().Value.radius;
                             EntityManager.SetComponentData(entity, physicsObject);
                         }
                     }

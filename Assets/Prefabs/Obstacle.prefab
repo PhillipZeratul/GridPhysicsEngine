@@ -109,7 +109,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SerializedData:
-    maxRndMoveSpeed: 0.5
+    maxRndMoveSpeed: 0.3
 --- !u!114 &2182305777702149823
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -131,4 +131,5 @@ MonoBehaviour:
     yy: -0.16617271
     dx: 0.0106817875
     dy: -0.037758023
-    radius: 0.3
+    radius: 0.35
+    moveSpeed: 0
